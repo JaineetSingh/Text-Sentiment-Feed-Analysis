@@ -1,0 +1,116 @@
+
+
+import feedparser as fp
+from textblob import  TextBlob
+import pandas as pd
+import nltk
+
+##TOPIC - Cricket
+
+url="https://www.hindustantimes.com/feeds/rss/cricket/rssfeed.xml"
+
+
+filename1="HindustanSports.csv"
+filename2="HinduSports.csv"
+
+
+##The Hindustan times
+
+f1=open(filename1,"w")
+f1.write("Title,Description\n")
+f1.close()
+
+feeds=fp.parse(url)
+
+count=0
+for feed in feeds['items']:
+    ##print(feed.title)
+    ##print(feed.summary)
+    try:
+        f=open(filename1,"a")
+        f.write(feed.title.replace(","," ") + "," + feed.summary.replace(","," ") + "\n")
+        f.close
+    except:
+        continue
+
+    count +=1
+
+print(count)
+
+### The Hindu
+
+
+url2="https://www.thehindu.com/sport/cricket/feeder/default.rss"
+
+f2=open(filename2,"w")
+f2.write("Title,Summary\n")
+f2.close()
+feeds2=fp.parse(url2)
+
+
+for feeds in feeds2['items']:
+    ##print(feeds.title)
+    ##print(feeds.summary)
+    try:
+        f=open(filename2,"a")
+        f.write(feeds.title.replace(","," ") + "," + feeds.summary.replace(","," ") + "\n")
+        f.close
+    except:
+        continue
+    count+=1
+
+print(count)
+
+####################################################################
+
+from nltk.corpus import stopwords
+sr= stopwords.words('english')
+Tokens=[]
+###############################
+
+
+
+Dataset1=pd.read_csv("HindustanSports.csv", header=0 , encoding='cp1252')
+sentiment=[]
+for senti in Dataset1['Description']:
+    Ment=TextBlob(senti)
+    Token= [t for t in senti.split()]
+    Tokens.append(Token)
+    if Ment.sentiment.polarity > 0 :
+        print(Ment.sentiment)
+        sentiment.append("Postive")
+    else:
+        print(Ment.sentiment)
+        sentiment.append("Negative")
+
+print(sentiment)
+Dataset1['Sentiment']=sentiment
+Dataset1['Keywords']=Tokens
+print(Dataset1.head())
+Dataset1.to_csv("Updated.csv")
+
+####################################################################
+
+Dataset2=pd.read_csv("HinduSports.csv", header=0 , encoding='cp1252')
+sentiment=[]
+Tokens2=[]
+for senti in Dataset2['Summary']:
+    Ment=TextBlob(senti)
+    Token2= [t for t in senti.split()]
+    Tokens2.append(Token2)
+    if Ment.sentiment.polarity > 0 :
+
+        sentiment.append("Postive")
+    else:
+
+        sentiment.append("Negative")
+
+print(sentiment)
+Dataset2['Sentiment']=sentiment
+Dataset2['Keywords']=Tokens2
+print(Dataset2.head())
+Dataset2.to_csv("Updated2.csv")
+
+####################################################################
+
+
